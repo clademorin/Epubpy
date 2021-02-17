@@ -35,7 +35,7 @@ class Book:
                     }
                     .PBodyTextFirstIndent {
                         display: block;
-                        font-family: {self.font}, serif;
+                        font-family: "Times New Roman", serif;
                         font-size: 1em;
                         margin-bottom: 0.8em;
                         margin-left: 0;

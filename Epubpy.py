@@ -201,7 +201,9 @@ class Book:
         toc.close()
         content.close()
 
-    def create_epub(self):
+    def create_epub(self, folder = None):
+        if not folder:
+            folder = self.folder
         make_archive(os.path.join(os.getcwd(), f"{self.title}"), 'zip', self.folder)
         os.chdir(os.getcwd())
         os.rename(f"{self.title}.zip", f"{self.title}.epub")

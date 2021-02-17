@@ -3,22 +3,22 @@ from shutil import make_archive, rmtree
 
 
 class Book:
-    def __init__(self, titolo="Titolo", genere="Genere", descrizione="Descrizione", autore="Autore", editore="Editore",
-                 data="2000-01-01T16:00:00+00:00", isbn="ISBN"):
+    def __init__(self, title="title", genre="genre", description="description", author="author", editor="editor",
+                 date="2000-01-01T16:00:00+00:00", isbn="ISBN"):
 
         root = os.getcwd()
         self.toc = ''
         self.content = ''
-        self.cartella = os.path.join(root, f"{titolo}")
-        self.capitoli = []
+        self.folder = os.path.join(root, f"{title}")
+        self.chapters = []
 
         self.language = 'en'
-        self.titolo = titolo
-        self.genere = genere
-        self.descrizione = descrizione
-        self.autore = autore
-        self.editore = editore
-        self.data = data
+        self.title = title
+        self.genre = genre
+        self.description = description
+        self.author = author
+        self.editor = editor
+        self.date = date
         self.isbn = isbn
         self.mimetype = "application/epub+zip"
         self.container = '''<?xml version="1.0"?>
@@ -35,7 +35,7 @@ class Book:
                     }
                     .PBodyTextFirstIndent {
                         display: block;
-                        font-family: "Times New Roman", serif;
+                        font-family: {self.font}, serif;
                         font-size: 1em;
                         margin-bottom: 0.8em;
                         margin-left: 0;
@@ -108,22 +108,23 @@ class Book:
                         display: block
                     }'''
 
-    def preparazione(self):
-        if os.path.exists(os.path.join(os.getcwd(), f"{self.titolo}.epub")):
-            os.remove(os.path.join(os.getcwd(), f"{self.titolo}.epub"))
-        if os.path.exists(self.cartella):
-            rmtree(self.cartella)
+    # Folder structure preparation
+    def preparation(self):
+        if os.path.exists(os.path.join(os.getcwd(), f"{self.title}.epub")):
+            os.remove(os.path.join(os.getcwd(), f"{self.title}.epub"))
+        if os.path.exists(self.folder):
+            rmtree(self.folder)
 
-        os.makedirs(self.cartella)
-        os.makedirs(self.cartella + r"\META-INF")
-        os.makedirs(self.cartella + r"\OPS")
-        with open(self.cartella + r"\META-INF\container.xml", 'w', encoding="UTF-8") as file:
+        os.makedirs(self.folder)
+        os.makedirs(self.folder + r"\META-INF")
+        os.makedirs(self.folder + r"\OPS")
+        with open(self.folder + r"\META-INF\container.xml", 'w', encoding="UTF-8") as file:
             file.write(self.container)
-        with open(self.cartella + r"\mimetype", 'w', encoding="UTF-8") as file:
+        with open(self.folder + r"\mimetype", 'w', encoding="UTF-8") as file:
             file.write(self.mimetype)
-        with open(self.cartella + r"\stylesheet.css", 'w', encoding="UTF-8") as file:
+        with open(self.folder + r"\stylesheet.css", 'w', encoding="UTF-8") as file:
             file.write(self.stylesheet)
-        with open(self.cartella + r"\toc.ncx", "w", encoding="UTF-8")as file:
+        with open(self.folder + r"\toc.ncx", "w", encoding="UTF-8")as file:
             file.write(f'''<?xml version='1.0' encoding='utf-8'?>\n
                         <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en">\n
                             <head>\n
@@ -134,51 +135,50 @@ class Book:
                                 <meta content="0" name="dtb:maxPageNumber"/>\n
                             </head>\n
                             <docTitle>\n
-                                <text>{self.titolo}</text>\n
+                                <text>{self.title}</text>\n
                             </docTitle>\n
                             <navMap>\n''')
-        with open(self.cartella + r"\content.opf", 'w', encoding="UTF-8") as file:
+        with open(self.folder + r"\content.opf", 'w', encoding="UTF-8") as file:
             file.write(f'''<?xml version='1.0' encoding='utf-8'?>
                         <package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="uuid_id">\n
-                            <metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:calibre="http://calibre.kovidgoyal.net/2009/metadata" xmlns:dc="http://purl.org/dc/elements/1.1/">\n
-                                <dc:publisher>{self.editore}</dc:publisher>\n
-                                <dc:description>{self.descrizione}</dc:description>\n
+                            <metadate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:calibre="http://calibre.kovidgoyal.net/2009/metadate" xmlns:dc="http://purl.org/dc/elements/1.1/">\n
+                                <dc:publisher>{self.editor}</dc:publisher>\n
+                                <dc:description>{self.description}</dc:description>\n
                                 <dc:language>{self.language}</dc:language>\n
-                                <dc:creator opf:file-as="{self.autore}" opf:role="aut">{self.autore}</dc:creator>\n
-                                <meta name="calibre:timestamp" content="{self.data}"/>\n
-                                <dc:title>{self.titolo}</dc:title>\n
+                                <dc:create_epubtor opf:file-as="{self.author}" opf:role="aut">{self.author}</dc:create_epubtor>\n
+                                <meta name="calibre:timestamp" content="{self.date}"/>\n
+                                <dc:title>{self.title}</dc:title>\n
                                 <meta name="cover" content="cover"/>\n
-                                <dc:date>{self.data}</dc:date>\n
+                                <dc:date>{self.date}</dc:date>\n
                                 <dc:contributor opf:role="bkp">Epubpy</dc:contributor>\n
                                 <dc:identifier opf:scheme="ISBN">{self.isbn}</dc:identifier>\n
                                 <dc:identifier id="uuid_id" opf:scheme="uuid">UUID</dc:identifier>\n
-                                <dc:subject>{self.genere}</dc:subject>\n
-                                </metadata>\n
+                                <dc:subject>{self.genre}</dc:subject>\n
+                                </metadate>\n
                                 <manifest>\n
                                 <item href="stylesheet.css" id="css" media-type="text/css"/>\n
                                 <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>\n''')
 
-    def aggiungi_capitoli(self, titolo='', capitolo=''):
-        self.capitoli.append((titolo, capitolo))
+    def add_chapter(self, title='', capitolo=''):
+        self.chapters.append((title, capitolo))
 
-    def unisci_capitoli(self, lista=None):
-
-        if not lista:
-            lista = self.capitoli
-        self.preparazione()
-        contatore = 1000
-        content = open(self.cartella + r"\content.opf", 'a', encoding="UTF-8")
-        toc = open(self.cartella + r"\toc.ncx", 'a', encoding="UTF-8")
-        for i in lista:
-            contatore += 1
-            toc.write(f'''<navPoint class="chapter" id="{contatore}" playOrder="{contatore}">
+    def merge_chapters(self, chapter_list=None):
+        if not chapter_list:
+            chapter_list = self.chapters
+        self.preparation()
+        counter = 1000
+        content = open(self.folder + r"\content.opf", 'a', encoding="UTF-8")
+        toc = open(self.folder + r"\toc.ncx", 'a', encoding="UTF-8")
+        for i in chapter_list:
+            counter += 1
+            toc.write(f'''<navPoint class="chapter" id="{counter}" playOrder="{counter}">
                    <navLabel>
                    <text>{i[0]}</text>
                     </navLabel>
                     <content src="OPS/{i[0]}.html"/>
                     </navPoint>\n''')
-            content.write(f'<item href="OPS/{i[0]}.html" id="{contatore}" media-type="application/xhtml+xml"/>\n')
-            with open(self.cartella + rf"\OPS\{i[0]}.html", 'w', encoding="UTF-8") as file:
+            content.write(f'<item href="OPS/{i[0]}.html" id="{counter}" media-type="application/xhtml+xml"/>\n')
+            with open(self.folder + rf"\OPS\{i[0]}.html", 'w', encoding="UTF-8") as file:
                 file.write(f'''<?xml version='1.0' encoding='utf-8'?>
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <head>
@@ -192,18 +192,17 @@ class Book:
                     </body>
                     </html>''')
         content.write('''</manifest>\n<spine toc="ncx">\n''')
-        contatore = 1000
-        for i in lista:
-            contatore += 1
-            content.write(f'<itemref idref="{contatore}"/>\n')
+        counter = 1000
+        for _ in chapter_list:
+            counter += 1
+            content.write(f'<itemref idref="{counter}"/>\n')
         content.write('</spine>\n</package>\n')
         toc.write("</navMap>\n</ncx>")
         toc.close()
         content.close()
 
-    def crea(self):
-
-        make_archive(os.path.join(os.getcwd(), f"{self.titolo}"), 'zip', self.cartella)
+    def create_epub(self):
+        make_archive(os.path.join(os.getcwd(), f"{self.title}"), 'zip', self.folder)
         os.chdir(os.getcwd())
-        os.rename(f"{self.titolo}.zip", f"{self.titolo}.epub")
-        rmtree(self.cartella, ignore_errors=True)
+        os.rename(f"{self.title}.zip", f"{self.title}.epub")
+        rmtree(self.folder, ignore_errors=True)
